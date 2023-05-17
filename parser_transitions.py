@@ -93,6 +93,8 @@ def minibatch_parse(sentences, model, batch_size):
                                                     same as in sentences (i.e., dependencies[i] should
                                                     contain the parse for sentences[i]).
     """
+    dependencies = []
+
     ### YOUR CODE HERE (~8-10 Lines)
     ### TODO:
     ###     Implement the minibatch parse algorithm.  Note that the pseudocode for this algorithm is given in the pdf handout.
@@ -106,14 +108,20 @@ def minibatch_parse(sentences, model, batch_size):
     ###             contains references to the same objects. Thus, you should NOT use the `del` operator
     ###             to remove objects from the `unfinished_parses` list. This will free the underlying memory that
     ###             is being accessed by `partial_parses` and may cause your code to crash.
-    dependencies = []
+
     partial_parses = [PartialParse(sentence) for sentence in sentences]
     unfinished_parses = partial_parses
+    lookup = [parser for parser in partial_parses]
     while len(unfinished_parses) != 0:
         transitions = model.predict(unfinished_parses[:batch_size])
         [partial_parse.parse_step(transition) for partial_parse, transition in zip(unfinished_parses[:batch_size], transitions)]
-        dependencies += [parsed.dependencies for parsed in unfinished_parses[:batch_size] if len(parsed.buffer) == 0 and len(parsed.stack) == 1]
+        dependencies += [{lookup.index(parsed): parsed.dependencies} for parsed in unfinished_parses[:batch_size] if len(parsed.buffer) == 0 and len(parsed.stack) == 1]
         unfinished_parses = [parsed for parsed in unfinished_parses if len(parsed.buffer) != 0 or len(parsed.stack) > 1]
+    dependencies = sorted(dependencies, key=lambda k: list(k.keys()))
+    dependencies = [list(item.values())[0] for item in dependencies]
+
+    ### END YOUR CODE
+
     return dependencies
 
 

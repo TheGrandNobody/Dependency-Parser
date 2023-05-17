@@ -72,7 +72,7 @@ class ParserModel(nn.Module):
         ### 
         ### See the PDF for hints.
 
-        self.embed_to_hidden_weight = nn.Parameter(torch.empty(n_features, hidden_size))
+        self.embed_to_hidden_weight = nn.Parameter(torch.empty(n_features*self.embed_size, hidden_size))
         self.embed_to_hidden_bias = nn.Parameter(torch.empty(hidden_size))
         nn.init.xavier_uniform_(self.embed_to_hidden_weight)
         nn.init.uniform_(self.embed_to_hidden_bias)
@@ -152,6 +152,7 @@ class ParserModel(nn.Module):
         ###     Matrix product: https://pytorch.org/docs/stable/torch.html#torch.matmul
         ###     ReLU: https://pytorch.org/docs/stable/nn.html?highlight=relu#torch.nn.functional.relu
 
+        w = self.embedding_lookup(w)
         x = w.float()
         h = self.dropout(F.relu(torch.matmul(x, self.embed_to_hidden_weight) + self.embed_to_hidden_bias))
         logits = torch.matmul(h, self.hidden_to_logits_weight) + self.hidden_to_logits_bias
