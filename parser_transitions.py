@@ -17,12 +17,17 @@ class PartialParse(object):
         """
         # The sentence being parsed is kept for bookkeeping purposes. Do NOT alter it in your code.
         self.sentence = sentence
+
+        ### OUR CODE HERE
+
         # The stack is where words that are currently being processed are kept
         self.stack = ["ROOT"]
         # The buffer is where words that are yet to be processed are kept
         self.buffer = [word for word in sentence]
         # The dependencies contains the list of dependencies produced so far.
         self.dependencies = []
+
+        ### END OF OUR CODE
 
 
     def parse_step(self, transition):
@@ -32,6 +37,8 @@ class PartialParse(object):
                                 left-arc, and right-arc transitions. You can assume the provided
                                 transition is a legal transition.
         """
+        ### OUR CODE HERE
+
         # If the transition is SHIFT
         if transition == "S":
             # Pop the first item from the buffer and push it onto the stack
@@ -45,6 +52,8 @@ class PartialParse(object):
         else:
             # Pop the top item off the stack and add it as a right dependent to the penultimate item on the stack
             self.dependencies.append((self.stack[-2], self.stack.pop(-1)))
+        
+        ### END OF OUR CODE
 
     def parse(self, transitions):
         """Applies the provided transitions to this PartialParse
@@ -81,6 +90,8 @@ def minibatch_parse(sentences, model, batch_size):
 
     dependencies = []
 
+    ### OUR CODE HERE
+
     # Initialize partial parses
     partial_parses = [PartialParse(sentence) for sentence in sentences]
     # Initialize unfinished parses
@@ -97,6 +108,8 @@ def minibatch_parse(sentences, model, batch_size):
         unfinished_parses = [parsed for parsed in unfinished_parses if len(parsed.buffer) != 0 or len(parsed.stack) > 1]
     # Sort the dependencies in the order the sentences were given
     return [item[1] for item in sorted(dependencies, key=lambda k: k[0])]
+
+    ### END OF OUR CODE
 
 
 def test_step(name, transition, stack, buf, deps,
